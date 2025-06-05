@@ -1,0 +1,11 @@
+name = "costco-deals-finder"
+main = "src/worker.ts"
+compatibility_date = "2024-02-20"
+
+[vars]
+ENVIRONMENT = "development"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "costco-savings"
+database_id = "236f573b-5b5a-4c74-ba54-dbc97f93ee8d"

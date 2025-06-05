@@ -1,0 +1,8 @@
+[Cursor] Initial commit: Project setup and infrastructure
+
+- Initialize project structure with monorepo setup
+- Set up development environment with Node.js and Python
+- Configure TypeScript and SvelteKit
+- Set up local D1 database for development
+- Configure environment variables and GitHub Actions
+- Add documentation (README, CONTRIBUTING, LICENSE) 

@@ -1,0 +1,3 @@
+-- Initial empty migration
+-- This file is intentionally empty as we're just setting up the migration structure
+-- Future migrations will be added here with actual schema changes 
