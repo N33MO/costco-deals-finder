@@ -14,4 +14,4 @@ describe('Worker', () => {
     const response = await worker.fetch(request);
     expect(response.status).toBe(404);
   });
-}); 
+});

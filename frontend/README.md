@@ -12,11 +12,13 @@ SvelteKit-based web interface for the Costco Deals Finder.
 ### Setup
 
 1. Install dependencies:
+
    ```bash
    npm install
    ```
 
 2. Create `.env` file:
+
    ```bash
    cp .env.example .env
    ```
@@ -57,4 +59,4 @@ npm run test:e2e
 - [ ] Search and filtering
 - [ ] User preferences
 - [ ] Responsive design
-- [ ] Accessibility support 
+- [ ] Accessibility support

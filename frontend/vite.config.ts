@@ -5,10 +5,10 @@ export default defineConfig({
   plugins: [sveltekit()],
   server: {
     port: 5173,
-    strictPort: false
+    strictPort: false,
   },
   preview: {
     port: 4173,
-    strictPort: false
-  }
-}); 
+    strictPort: false,
+  },
+});

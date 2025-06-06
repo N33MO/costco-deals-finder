@@ -13,21 +13,25 @@ Cloudflare Worker with D1 database for the Costco Deals Finder.
 ### Setup
 
 1. Install dependencies:
+
    ```bash
    npm install
    ```
 
 2. Create `.env` file:
+
    ```bash
    cp .env.example .env
    ```
 
 3. Set up local D1 database:
+
    ```bash
    wrangler d1 create costco-dev
    ```
 
 4. Apply migrations:
+
    ```bash
    wrangler d1 execute costco-dev --file=./migrations/0000_init.sql
    ```
@@ -84,4 +88,4 @@ See `migrations/0000_init.sql` for the complete schema.
 - [ ] Search functionality
 - [ ] Historical data support
 - [ ] Rate limiting
-- [ ] Authentication 
+- [ ] Authentication

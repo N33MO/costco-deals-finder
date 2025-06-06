@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
+    "check": "tsc --noEmit",
     "test": "vitest",
     "test:watch": "vitest watch",
     "lint": "prettier --check . && eslint .",
@@ -25,4 +26,4 @@
     "itty-router": "^4.0.27",
     "zod": "^3.22.4"
   }
-} 
+}

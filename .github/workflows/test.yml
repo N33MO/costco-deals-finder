@@ -20,17 +20,14 @@ jobs:
         cache: 'npm'
 
     - name: Install dependencies
-      run: |
-        npm ci
-        cd frontend && npm ci
-        cd ../backend && npm ci
+      run: npm ci
 
     - name: Type check
       run: |
-        cd frontend && npm run check
-        cd ../backend && tsc --noEmit
+        npm run check --workspace=frontend
+        npm run check --workspace=backend
 
-    - name: Lint
+    - name: Lint check
       run: |
-        cd frontend && npm run lint
-        cd ../backend && npm run lint 
+        npm run lint --workspace=frontend
+        npm run lint --workspace=backend 
