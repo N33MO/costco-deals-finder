@@ -1,29 +1,43 @@
 {
-  "name": "@costco-deals-finder/backend",
+  "name": "costco-deals-finder-backend",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "check": "tsc --noEmit",
+    "lint": "eslint . --ext .ts",
     "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:ci": "vitest run --coverage --reporter=json --outputFile=./coverage/test-results.json",
     "test:watch": "vitest watch",
-    "lint": "prettier --check . --ignore-path ../.prettierignore && eslint .",
-    "format": "prettier --write . --ignore-path ../.prettierignore"
+    "test:ui": "vitest --ui",
+    "prepare": "husky install"
+  },
+  "dependencies": {
+    "@cloudflare/workers-types": "^4.20240208.0",
+    "hono": "^4.0.5",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20240208.0",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
+    "@types/node": "^20.11.19",
+    "@typescript-eslint/eslint-plugin": "^7.0.1",
+    "@typescript-eslint/parser": "^7.0.1",
+    "@vitest/coverage-v8": "^1.2.1",
+    "@vitest/ui": "^1.6.1",
     "eslint": "^8.56.0",
-    "eslint-config-prettier": "^9.1.0",
-    "prettier": "^3.1.1",
-    "typescript": "^5.0.0",
+    "happy-dom": "^13.3.8",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
+    "typescript": "^5.3.3",
     "vitest": "^1.2.1",
     "wrangler": "^3.28.1"
   },
-  "dependencies": {
-    "itty-router": "^4.0.27",
-    "zod": "^3.22.4"
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   }
 }

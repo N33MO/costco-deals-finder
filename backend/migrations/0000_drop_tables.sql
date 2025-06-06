@@ -1,0 +1,4 @@
+DROP TABLE IF EXISTS offer_snapshot;
+DROP TABLE IF EXISTS offer_period;
+DROP TABLE IF EXISTS alias;
+DROP TABLE IF EXISTS product; 

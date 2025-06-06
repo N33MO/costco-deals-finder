@@ -33,7 +33,7 @@ Cloudflare Worker with D1 database for the Costco Deals Finder.
 4. Apply migrations:
 
    ```bash
-   wrangler d1 execute costco-dev --file=./migrations/0000_init.sql
+   wrangler d1 execute costco-dev --file=./migrations/0001_schema.sql
    ```
 
 5. Start development server:
@@ -53,37 +53,82 @@ Cloudflare Worker with D1 database for the Costco Deals Finder.
 ### Testing
 
 ```bash
-# Unit tests
+# Run all tests
 npm run test
 
-# Integration tests
-npm run test:integration
+# Run tests in watch mode
+npm run test:watch
+
+# Run unit tests only
+npm run test:unit
+
+# Run tests with coverage
+npm run test:coverage
+
+# Run tests in CI mode
+npm run test:ci
 ```
 
 ## Project Structure
 
 - `src/`: Source code
-  - `db/`: Database migrations and utilities
-  - `lib/`: Shared utilities
-  - `worker.ts`: Main Worker implementation
+  - `api/`: API route handlers
+  - `db/`: Database access layer
+  - `types/`: TypeScript type definitions
+  - `index.ts`: Main Worker entry point
 - `test/`: Test files
   - `unit/`: Unit tests
-  - `integration/`: Integration tests
-- `migrations/`: SQL migration files
+    - `api/`: API route tests
+  - `helpers/`: Test utilities
+  - `migrations/`: Test database schema
+- `migrations/`: Production database migrations
 
 ## API Endpoints
 
-- `GET /api/deals/today`: Get today's deals
-- `POST /api/deals/ingest`: Ingest new deals (protected)
-- `GET /api/deals/search`: Search deals
-- `GET /api/deals/history`: Get historical deals
+### GET /api/deals/today
+Get today's active deals.
+
+**Query Parameters:**
+- `region` (optional): Filter deals by region (default: 'US')
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "product_id": 1,
+      "region": "US",
+      "sale_type": "dollar",
+      "discount_low": 5.00,
+      "discount_high": 5.00,
+      "currency": "USD",
+      "limit_qty": 2,
+      "details": "Test details",
+      "starts": "2024-03-20",
+      "ends": "2024-04-03",
+      "created_at": "2024-03-20T00:00:00Z",
+      "updated_at": "2024-03-20T00:00:00Z"
+    }
+  ],
+  "meta": {
+    "count": 1,
+    "region": "US",
+    "timestamp": "2024-03-20T00:00:00Z"
+  }
+}
+```
 
 ## Database Schema
 
-See `migrations/0000_init.sql` for the complete schema.
+See `migrations/0001_schema.sql` for the complete schema.
 
 ## Features
 
+- [x] Basic API structure with Hono
+- [x] D1 database integration
+- [x] Unit testing setup
+- [ ] Integration testing
 - [ ] Deal ingestion pipeline
 - [ ] Search functionality
 - [ ] Historical data support

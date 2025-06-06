@@ -8,4 +8,4 @@ ENVIRONMENT = "development"
 [[d1_databases]]
 binding = "DB"
 database_name = "costco-savings"
-database_id = "236f573b-5b5a-4c74-ba54-dbc97f93ee8d"
+database_id = ""
