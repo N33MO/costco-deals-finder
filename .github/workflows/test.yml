@@ -1,4 +1,4 @@
-name: Test
+name: Validate
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+  validate:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,12 +25,12 @@ jobs:
         cd frontend && npm ci
         cd ../backend && npm ci
 
-    - name: Run frontend tests
+    - name: Type check
       run: |
-        cd frontend
-        npm run test
+        cd frontend && npm run check
+        cd ../backend && tsc --noEmit
 
-    - name: Run backend tests
+    - name: Lint
       run: |
-        cd backend
-        npm run test 
+        cd frontend && npm run lint
+        cd ../backend && npm run lint 
