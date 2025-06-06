@@ -12,15 +12,18 @@
     "test": "npm run test --workspaces",
     "lint": "prettier --check . && eslint .",
     "format": "prettier --write .",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "devDependencies": {
-    "husky": "^9.0.11",
-    "lint-staged": "^15.2.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.2",
     "prettier": "^3.1.1",
     "typescript": "^5.3.3"
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "lint-staged": {
+    "**/*.{js,ts,svelte,json,md}": "prettier --write"
   }
-} 
+}

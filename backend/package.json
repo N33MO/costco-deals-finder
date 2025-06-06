@@ -8,8 +8,8 @@
     "check": "tsc --noEmit",
     "test": "vitest",
     "test:watch": "vitest watch",
-    "lint": "prettier --check . && eslint .",
-    "format": "prettier --write ."
+    "lint": "prettier --check . --ignore-path ../.prettierignore && eslint .",
+    "format": "prettier --write . --ignore-path ../.prettierignore"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240208.0",
