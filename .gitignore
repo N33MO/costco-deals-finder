@@ -52,3 +52,10 @@ venv.bak/
 .dev.vars 
 wrangler.toml
 wrangler.dev.toml
+
+# Crawler specific
+*.html
+*.ndjson
+*chromedriver-mac-arm64
+chromedriver
+chromedriver.exe

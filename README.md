@@ -28,17 +28,20 @@ A web application that helps users track and analyze Costco deals and savings.
 ### Getting Started
 
 1. Clone the repository:
+
    ```bash
    git clone <repository-url>
    cd costco-deals-finder
    ```
 
 2. Install root dependencies:
+
    ```bash
    npm install
    ```
 
 3. Set up environment variables:
+
    ```bash
    cp .env.example .env
    # Edit .env with your Cloudflare credentials
@@ -47,12 +50,14 @@ A web application that helps users track and analyze Costco deals and savings.
 4. Install and set up each component:
 
    **Frontend:**
+
    ```bash
    cd frontend
    npm install
    ```
 
    **Backend:**
+
    ```bash
    cd backend
    npm install
@@ -63,6 +68,7 @@ A web application that helps users track and analyze Costco deals and savings.
    ```
 
    **Crawler:**
+
    ```bash
    cd crawler
    python -m venv venv
@@ -71,6 +77,7 @@ A web application that helps users track and analyze Costco deals and savings.
    ```
 
 5. Start development servers:
+
    ```bash
    # Frontend (in one terminal)
    cd frontend
@@ -93,6 +100,7 @@ A web application that helps users track and analyze Costco deals and savings.
 🚧 Under Development 🚧
 
 ### Completed Tasks (Phase 1)
+
 - [x] Initialize project structure
 - [x] Set up development environment
 - [x] Configure TypeScript and SvelteKit
@@ -104,11 +112,25 @@ A web application that helps users track and analyze Costco deals and savings.
   - [x] Set up testing workflows
   - [ ] Configure GitHub Secrets (future task)
 
+### Completed Tasks (Phase 2)
+
+- [x] Design and implement database schema
+- [x] Create Cloudflare Worker API endpoints
+- [x] Set up testing framework
+- [x] Implement data ingestion pipeline
+  - [x] Set up crawler infrastructure
+  - [x] Implement HTML parsing
+  - [x] Add NDJSON output format
+  - [x] Configure ChromeDriver management
+
 ### Next Steps
-- [ ] Begin Phase 2: Backend Development
-  - [ ] Design and implement database schema
-  - [ ] Create Cloudflare Worker API endpoints
-  - [ ] Set up testing framework
+
+- [ ] Complete Phase 2: Backend Development
+  - [ ] Implement integration tests
+  - [ ] Set up data processing and transformation
+- [ ] Begin Phase 3: Frontend Development
+  - [ ] Create skeleton portal
+  - [ ] Design and implement user interface
 
 ## Contributing
 
