@@ -31,7 +31,7 @@ app.onError((err: Error, c: Context) => {
 });
 
 // Health check endpoint
-app.get('/', (c: Context) => c.json({ status: 'ok' }));
+app.get('/', (c: Context) => c.text('Costco Deals Finder API'));
 
 // Get current deals
 app.get('/api/deals/today', async (c: Context) => {
@@ -51,6 +51,31 @@ app.get('/api/deals/today', async (c: Context) => {
   } catch (error) {
     if (error instanceof Error) {
       throw new HTTPException(500, { message: `Failed to fetch current deals: ${error.message}` });
+    }
+    throw new HTTPException(500, { message: 'An unexpected error occurred' });
+  }
+});
+
+// Ingest deals
+app.post('/api/ingest', async (c: Context) => {
+  const db = new Database(c.env.DB);
+  const body = await c.req.json();
+
+  // Validate request body
+  if (!Array.isArray(body)) {
+    throw new HTTPException(400, { message: 'Request body must be an array of deals' });
+  }
+
+  try {
+    const result = await db.ingestDeals(body);
+    return c.json({
+      status: 'success',
+      message: result.message,
+      details: result.details,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new HTTPException(500, { message: `Failed to ingest deals: ${error.message}` });
     }
     throw new HTTPException(500, { message: 'An unexpected error occurred' });
   }

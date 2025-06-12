@@ -25,5 +25,11 @@
   },
   "lint-staged": {
     "**/*.{js,ts,svelte,json,md}": "prettier --write"
+  },
+  "dependencies": {
+    "@sveltejs/kit": "^2.21.4",
+    "dotenv": "^16.5.0",
+    "happy-dom": "^18.0.1",
+    "vite": "^6.3.5"
   }
 }

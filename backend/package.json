@@ -27,7 +27,7 @@
     "@vitest/coverage-v8": "^1.2.1",
     "@vitest/ui": "^1.6.1",
     "eslint": "^8.56.0",
-    "happy-dom": "^13.3.8",
+    "happy-dom": "^18.0.1",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
     "typescript": "^5.3.3",

@@ -117,11 +117,7 @@ A web application that helps users track and analyze Costco deals and savings.
 - [x] Design and implement database schema
 - [x] Create Cloudflare Worker API endpoints
 - [x] Set up testing framework
-- [x] Implement data ingestion pipeline
-  - [x] Set up crawler infrastructure
-  - [x] Implement HTML parsing
-  - [x] Add NDJSON output format
-  - [x] Configure ChromeDriver management
+- [x] Implement deal ingestion pipeline (crawler and NDJSON output)
 
 ### Next Steps
 

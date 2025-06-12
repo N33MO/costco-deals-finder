@@ -128,6 +128,31 @@ def parse_discount(price_block: "Tag") -> tuple[float, str] | None:
     kind = "percent" if symbol == "%" else "dollar"
     return number, kind
 
+def extract_offer_channel(tile: "Tag") -> str:
+    """
+    Extract the offer channel from the tile.
+    Returns one of: "Warehouse-Only", "In-Warehouse & Online", or "Online-Only"
+    """
+    strip_div = tile.find("div", {"data-testid": "strip"})
+    if not strip_div:
+        return "Unknown"
+    
+    text_div = strip_div.find("div", {"data-testid": "Text"})
+    if not text_div:
+        return "Unknown"
+    
+    channel_text = text_div.get_text(strip=True)
+    
+    # Map the text to our standardized channel names
+    if "Warehouse-Only" in channel_text:
+        return "Warehouse-Only"
+    elif "In-Warehouse & Online" in channel_text:
+        return "In-Warehouse & Online"
+    elif "Online-Only" in channel_text:
+        return "Online-Only"
+    else:
+        return "Unknown"
+
 # ────────────────────────────────────────────────────────────────────────────
 deals = []
 
@@ -139,7 +164,6 @@ for tile in tiles:
     # <a href="…product.100352100.html"> is the wrapper
     a      = tile.find("a", href=True)
     link   = a["href"] if a else None     # If link is missing, continue
-
 
     # discount: <div data-testid="prices_and_percentages_prices">
     price_blk = tile.find("div", {"data-testid": "prices_and_percentages_prices"})
@@ -173,6 +197,9 @@ for tile in tiles:
     # Determine category based on product name and details
     category = determine_category(name, details)
 
+    # Extract offer channel
+    offer_channel = extract_offer_channel(tile)
+
     deals.append({
         "link":     link,
         "sku":      sku,
@@ -182,7 +209,8 @@ for tile in tiles:
         "discount_type": discount_type,  # 'dollar' or 'percent'
         "details":  details,
         "seen_at":  NOW_ISO,
-        "valid_period": valid_period
+        "valid_period": valid_period,
+        "offer_channel": offer_channel  # Add the offer channel to the output
     })
 
 # ────────────────────────────────────────────────────────────────────────────

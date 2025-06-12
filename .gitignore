@@ -59,3 +59,7 @@ wrangler.dev.toml
 *chromedriver-mac-arm64
 chromedriver
 chromedriver.exe
+
+# Ignore generated SQL files
+hotbuys*.sql
+savings*.sql

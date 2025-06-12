@@ -129,7 +129,7 @@ See `migrations/0001_schema.sql` for the complete schema.
 - [x] D1 database integration
 - [x] Unit testing setup
 - [ ] Integration testing
-- [ ] Deal ingestion pipeline
+- [x] Deal ingestion pipeline (data is ingested via the Python-based crawler and loaded into the D1 database for API access)
 - [ ] Search functionality
 - [ ] Historical data support
 - [ ] Rate limiting
