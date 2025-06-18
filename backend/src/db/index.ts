@@ -68,18 +68,29 @@ export class Database {
   }
 
   // Offer Period methods
-  async getCurrentOffers(region: string = 'US'): Promise<OfferPeriod[]> {
-    const now = new Date().toISOString().split('T')[0];
+  async getCurrentOffers(
+    region: string = 'US',
+    date?: string
+  ): Promise<
+    Array<
+      OfferPeriod & { sku: string; name: string; category: string | null; brand: string | null }
+    >
+  > {
+    const now = date || new Date().toISOString().split('T')[0];
     const result = await this.db
       .prepare(
         `
-                SELECT * FROM offer_period 
-                WHERE region = ? AND starts <= ? AND ends >= ?
-                ORDER BY starts DESC
-            `
+          SELECT offer_period.*, product.sku, product.name, product.category, product.brand
+          FROM offer_period
+          JOIN product ON offer_period.product_id = product.id
+          WHERE offer_period.region = ? AND offer_period.starts <= ? AND offer_period.ends >= ?
+          ORDER BY offer_period.starts DESC
+        `
       )
       .bind(region, now, now)
-      .all<OfferPeriod>();
+      .all<
+        OfferPeriod & { sku: string; name: string; category: string | null; brand: string | null }
+      >();
     return result.results;
   }
 

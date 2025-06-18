@@ -11,7 +11,7 @@ parser.add_argument('--html_out', type=str, default='savings.html', help='The HT
 args = parser.parse_args()
 
 # Configure ChromeDriver (Selenium >=4.10 expects Service / Options objects)
-chrome_service = Service('./chromedriver-mac-arm64/chromedriver')
+chrome_service = Service('../../scripts/chromedriver-mac-arm64/chromedriver')
 chrome_options = Options()
 chrome_options.add_argument("--disable-features=NetworkServiceInProcess")
 chrome_options.add_argument("--disable-http2")                  # bypass Akamai glitch

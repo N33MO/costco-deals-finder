@@ -63,3 +63,6 @@ chromedriver.exe
 # Ignore generated SQL files
 hotbuys*.sql
 savings*.sql
+
+# Ignore SvelteKit build output
+frontend/.svelte-kit/

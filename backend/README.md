@@ -90,6 +90,7 @@ Get today's active deals.
 
 **Query Parameters:**
 - `region` (optional): Filter deals by region (default: 'US')
+- `date` (optional): Date in YYYY-MM-DD format (from user's local timezone; defaults to UTC if not provided)
 
 **Response:**
 ```json
@@ -134,3 +135,4 @@ See `migrations/0001_schema.sql` for the complete schema.
 - [ ] Historical data support
 - [ ] Rate limiting
 - [ ] Authentication
+- [x] /api/deals/today supports a 'date' parameter for local time (frontend sends user's local date)

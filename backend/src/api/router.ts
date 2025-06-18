@@ -36,10 +36,13 @@ app.get('/', (c: Context) => c.text('Costco Deals Finder API'));
 // Get current deals
 app.get('/api/deals/today', async (c: Context) => {
   const region = c.req.query('region') || 'US';
-  const db = new Database(c.env.DB);
+  const date = c.req.query('date');
+  const db = new Database(c.env.costco_DB);
+  // log the current date in the format YYYY-MM-DD
+  console.log(date);
 
   try {
-    const offers = await db.getCurrentOffers(region);
+    const offers = await db.getCurrentOffers(region, date);
     return c.json({
       data: offers,
       meta: {
@@ -58,7 +61,7 @@ app.get('/api/deals/today', async (c: Context) => {
 
 // Ingest deals
 app.post('/api/ingest', async (c: Context) => {
-  const db = new Database(c.env.DB);
+  const db = new Database(c.env.costco_DB);
   const body = await c.req.json();
 
   // Validate request body

@@ -121,12 +121,15 @@ A web application that helps users track and analyze Costco deals and savings.
 
 ### Next Steps
 
-- [ ] Complete Phase 2: Backend Development
-  - [ ] Implement integration tests
-  - [ ] Set up data processing and transformation
-- [ ] Begin Phase 3: Frontend Development
-  - [ ] Create skeleton portal
-  - [ ] Design and implement user interface
+- [x] Complete Phase 4: Frontend Development (Step 1)
+  - [x] Home page displays today's deals in a responsive grid of DealCards
+  - [x] Navbar for navigation (Home, Historical Deals, Search)
+  - [x] Frontend fetches deals using user's local date (timezone-aware)
+  - [x] /api/deals/today endpoint supports a date parameter for local time
+- [ ] Step 2: Historical Deals UI
+  - [ ] Create /history page with date picker
+  - [ ] Fetch and display deals for a selected date
+- [ ] Continue backend and integration improvements
 
 ## Contributing
 

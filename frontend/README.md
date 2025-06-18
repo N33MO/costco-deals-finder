@@ -55,8 +55,10 @@ npm run test:e2e
 
 ## Features
 
-- [ ] Deal browsing interface
+- [x] Responsive home page with grid of DealCards for today's deals
+- [x] Navbar for navigation (Home, Historical Deals, Search)
+- [x] Fetches deals using user's local date (timezone-aware)
+- [ ] Historical deals by date
 - [ ] Search and filtering
 - [ ] User preferences
-- [ ] Responsive design
 - [ ] Accessibility support
