@@ -66,6 +66,12 @@ def validate_deal(deal: Dict[str, Any]) -> Tuple[bool, str]:
     if not deal.get('valid_period', {}).get('starts') or not deal.get('valid_period', {}).get('ends'):
         return False, "Invalid valid period dates"
     
+    # if not deal.get('image_url'):
+    #     return False, "Missing image URL"
+    
+    if not deal.get('channel'):
+        return False, "Missing channel"
+    
     # Check for valid discount type
     if deal['discount_type'] not in ['dollar', 'percent']:
         return False, f"Invalid discount type: {deal['discount_type']}"
@@ -90,6 +96,7 @@ def transform_deal(deal: Dict[str, Any]) -> Dict[str, Any]:
         "sku": deal["sku"],
         "name": deal["name"],
         "category": deal.get("category", "Other"),
+        "image_url": deal.get("image_url", None),
         "brand": None  # We'll set this to NULL for now
     }
 
@@ -103,7 +110,8 @@ def transform_deal(deal: Dict[str, Any]) -> Dict[str, Any]:
         "limit_qty": extract_limit_qty(deal["details"]),
         "details": deal["details"],
         "starts": deal["valid_period"]["starts"],
-        "ends": deal["valid_period"]["ends"]
+        "ends": deal["valid_period"]["ends"],
+        "channel": deal["channel"]
     }
 
     # Create offer snapshot

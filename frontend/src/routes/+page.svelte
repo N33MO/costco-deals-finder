@@ -22,6 +22,8 @@
     name: string;
     category: string | null;
     brand: string | null;
+    image_url: string | null;
+    channel: string | null;
   };
 
   let deals: Deal[] = [];

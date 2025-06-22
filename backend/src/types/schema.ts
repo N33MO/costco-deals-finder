@@ -4,6 +4,7 @@ export interface Product {
   name: string;
   category: string | null;
   brand: string | null;
+  image_url: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -12,6 +13,7 @@ export interface OfferPeriod {
   id: number;
   product_id: number;
   region: string;
+  channel: string | null;
   sale_type: 'dollar' | 'percent';
   discount_low: number;
   discount_high: number;

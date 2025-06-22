@@ -77,6 +77,7 @@ def transform_product(deal: Dict[str, Any]) -> Dict[str, Any]:
         "name": deal["name"],
         "category": deal.get("category", "Other"),
         "brand": deal.get("brand"),
+        "image_url": deal.get("image_url"),
     }
 
 def transform_offer_period(deal: Dict[str, Any]) -> Dict[str, Any]:
@@ -88,6 +89,7 @@ def transform_offer_period(deal: Dict[str, Any]) -> Dict[str, Any]:
     return {
         "product_id": f"(SELECT id FROM product WHERE sku = '{deal['sku']}')",
         "region": deal.get("region", "US"),
+        "channel": deal.get("channel", "Unknown"),
         "sale_type": deal["discount_type"],
         "discount_low": deal["discount"],
         "discount_high": deal["discount"],

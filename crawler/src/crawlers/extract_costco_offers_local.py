@@ -28,6 +28,13 @@ soup      = BeautifulSoup(html_file.read_text("utf-8"), "lxml")
 ITEM_RE    = re.compile(r"Item\s+(\d+)")
 NOW_ISO    = dt.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
 
+def clean_archive_url(url: str) -> str:
+    """Removes web.archive.org prefix from a URL if present."""
+    # This pattern is designed to find the archive prefix, e.g., /web/20241217051439/,
+    # and we take the part of the string that comes after it.
+    parts = re.split(r'/web/\d+/', url)
+    return parts[-1]
+
 # Category mapping based on product names and details
 CATEGORY_KEYWORDS = {
     "Home & Kitchen": ["plate", "cup", "utensil", "cookware", "kitchen", "appliance", "vacuum", "fan", "light", "furniture"],
@@ -153,6 +160,31 @@ def extract_offer_channel(tile: "Tag") -> str:
     else:
         return "Unknown"
 
+def extract_image_url(tile: "Tag") -> str | None:
+    """Extract the product image URL from the tile."""
+    img_tag = tile.find("img", {"data-testid": "ImageVideo_Image"})
+    if not img_tag:
+        return None
+
+    # Prioritize src, as it is more reliable on archived pages.
+    if img_tag.has_attr("src"):
+        src_url = img_tag["src"]
+        # Append width=320 to get a smaller image, if not already present.
+        if 'width=' not in src_url:
+            return f"{src_url}&width=320"
+        return src_url
+
+    # Fallback to srcset for live pages.
+    if img_tag.has_attr("srcset"):
+        srcset = img_tag["srcset"]
+        # Find the URL for 320w
+        for part in srcset.split(","):
+            part = part.strip()
+            if part.endswith(" 320w"):
+                return part.split(" ")[0]
+
+    return None
+
 # ────────────────────────────────────────────────────────────────────────────
 deals = []
 
@@ -163,7 +195,12 @@ tiles = soup.find_all("div", {"data-testid": "AdBuilder"})
 for tile in tiles:
     # <a href="…product.100352100.html"> is the wrapper
     a      = tile.find("a", href=True)
-    link   = a["href"] if a else None     # If link is missing, continue
+    if not a:
+        continue
+    link   = clean_archive_url(a["href"])
+
+    # Extract image URL
+    image_url = extract_image_url(tile)
 
     # discount: <div data-testid="prices_and_percentages_prices">
     price_blk = tile.find("div", {"data-testid": "prices_and_percentages_prices"})
@@ -204,13 +241,14 @@ for tile in tiles:
         "link":     link,
         "sku":      sku,
         "name":     name,
+        "image_url": image_url,
         "category": category,
         "discount": discount,          # numeric
         "discount_type": discount_type,  # 'dollar' or 'percent'
         "details":  details,
         "seen_at":  NOW_ISO,
         "valid_period": valid_period,
-        "offer_channel": offer_channel  # Add the offer channel to the output
+        "channel": offer_channel  # Add the offer channel to the output
     })
 
 # ────────────────────────────────────────────────────────────────────────────

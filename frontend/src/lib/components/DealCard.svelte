@@ -1,9 +1,11 @@
 <script lang="ts">
   export let sku: string;
   export let name: string;
+  export let image_url: string | null = null;
   export let category: string | null = null;
   export let brand: string | null = null;
   export let region: string;
+  export let channel: string | null = null;
   export let sale_type: 'dollar' | 'percent';
   export let discount_low: number;
   export let discount_high: number;
@@ -15,6 +17,14 @@
 </script>
 
 <div class="deal-card">
+  {#if channel}
+    <div class="deal-channel">{channel}</div>
+  {/if}
+  {#if image_url}
+    <div class="deal-image">
+      <img src={image_url} alt={name} />
+    </div>
+  {/if}
   <div class="deal-header">
     <h2>{name}</h2>
     <span class="sku">SKU: {sku}</span>
@@ -108,5 +118,25 @@
     background: #f8f8f8;
     border-radius: 0.5rem;
     padding: 0.5rem 0.75rem;
+  }
+  .deal-channel {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #fff;
+    background-color: #005fcc;
+    padding: 0.2rem 0.6rem;
+    border-radius: 0.5rem;
+    align-self: flex-start;
+    text-transform: uppercase;
+  }
+  .deal-image {
+    width: 100%;
+    margin-bottom: 0.75rem;
+  }
+  .deal-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    object-fit: cover;
   }
 </style>

@@ -73,14 +73,26 @@ export class Database {
     date?: string
   ): Promise<
     Array<
-      OfferPeriod & { sku: string; name: string; category: string | null; brand: string | null }
+      OfferPeriod & {
+        sku: string;
+        name: string;
+        category: string | null;
+        brand: string | null;
+        image_url: string | null;
+      }
     >
   > {
     const now = date || new Date().toISOString().split('T')[0];
     const result = await this.db
       .prepare(
         `
-          SELECT offer_period.*, product.sku, product.name, product.category, product.brand
+          SELECT
+            offer_period.*,
+            product.sku,
+            product.name,
+            product.category,
+            product.brand,
+            product.image_url
           FROM offer_period
           JOIN product ON offer_period.product_id = product.id
           WHERE offer_period.region = ? AND offer_period.starts <= ? AND offer_period.ends >= ?
@@ -89,7 +101,13 @@ export class Database {
       )
       .bind(region, now, now)
       .all<
-        OfferPeriod & { sku: string; name: string; category: string | null; brand: string | null }
+        OfferPeriod & {
+          sku: string;
+          name: string;
+          category: string | null;
+          brand: string | null;
+          image_url: string | null;
+        }
       >();
     return result.results;
   }
@@ -184,9 +202,11 @@ export class Database {
         name: string;
         category?: string;
         brand?: string | null;
+        image_url?: string | null;
       };
       offer_period: {
         region: string;
+        channel?: string | null;
         sale_type: 'dollar' | 'percent';
         discount_low: number;
         discount_high: number;
@@ -216,12 +236,13 @@ export class Database {
         // 1. Insert or update product
         const productResult = await this.db
           .prepare(
-            `INSERT INTO product (sku, name, category, brand)
-              VALUES (?, ?, ?, ?)
+            `INSERT INTO product (sku, name, category, brand, image_url)
+              VALUES (?, ?, ?, ?, ?)
               ON CONFLICT(sku) DO UPDATE SET
                 name = excluded.name,
                 category = COALESCE(excluded.category, product.category),
                 brand = COALESCE(excluded.brand, product.brand),
+                image_url = COALESCE(excluded.image_url, product.image_url),
                 updated_at = CURRENT_TIMESTAMP
               RETURNING id`
           )
@@ -229,7 +250,8 @@ export class Database {
             deal.product.sku,
             deal.product.name,
             deal.product.category || null,
-            deal.product.brand || null
+            deal.product.brand || null,
+            deal.product.image_url || null
           )
           .first<{ id: number }>();
 
@@ -244,9 +266,9 @@ export class Database {
           .prepare(
             `INSERT INTO offer_period (
               product_id, region, sale_type, discount_low, discount_high,
-              currency, limit_qty, details, starts, ends
+              currency, limit_qty, details, starts, ends, channel
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(product_id, starts, ends, region) DO UPDATE SET
               sale_type = excluded.sale_type,
               discount_low = excluded.discount_low,
@@ -254,6 +276,7 @@ export class Database {
               currency = excluded.currency,
               limit_qty = excluded.limit_qty,
               details = excluded.details,
+              channel = COALESCE(excluded.channel, offer_period.channel),
               updated_at = CURRENT_TIMESTAMP
             RETURNING id`
           )
@@ -267,7 +290,8 @@ export class Database {
             deal.offer_period.limit_qty || null,
             deal.offer_period.details || null,
             deal.offer_period.starts,
-            deal.offer_period.ends
+            deal.offer_period.ends,
+            deal.offer_period.channel || null
           )
           .first<{ id: number }>();
 
