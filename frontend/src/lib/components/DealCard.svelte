@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { loadPictures } from '$lib/stores/settings';
+
   export let sku: string;
   export let name: string;
   export let image_url: string | null = null;
@@ -20,7 +22,7 @@
   {#if channel}
     <div class="deal-channel">{channel}</div>
   {/if}
-  {#if image_url}
+  {#if image_url && $loadPictures}
     <div class="deal-image">
       <img src={image_url} alt={name} />
     </div>

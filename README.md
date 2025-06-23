@@ -8,6 +8,12 @@ A web application that helps users track and analyze Costco deals and savings.
 - `backend/`: Cloudflare Worker with D1 database
 - `crawler/`: Python-based data collection system
 
+## Key Features
+
+- **Deal Search**: Search through all historical deals by keyword.
+- **Image Toggling**: Enable or disable product image loading to save bandwidth.
+- **Daily Deals**: View all active deals for the current day.
+
 ## Technical Stack
 
 - Frontend: SvelteKit + TypeScript

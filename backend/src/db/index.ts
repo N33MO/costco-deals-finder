@@ -67,6 +67,46 @@ export class Database {
     return result;
   }
 
+  async searchOffers(query: string): Promise<
+    Array<
+      OfferPeriod & {
+        sku: string;
+        name: string;
+        category: string | null;
+        brand: string | null;
+        image_url: string | null;
+      }
+    >
+  > {
+    const result = await this.db
+      .prepare(
+        `
+          SELECT
+            offer_period.*,
+            product.sku,
+            product.name,
+            product.category,
+            product.brand,
+            product.image_url
+          FROM offer_period
+          JOIN product ON offer_period.product_id = product.id
+          WHERE product.name LIKE ?
+          ORDER BY offer_period.starts DESC
+        `
+      )
+      .bind(`%${query}%`)
+      .all<
+        OfferPeriod & {
+          sku: string;
+          name: string;
+          category: string | null;
+          brand: string | null;
+          image_url: string | null;
+        }
+      >();
+    return result.results;
+  }
+
   // Offer Period methods
   async getCurrentOffers(
     region: string = 'US',

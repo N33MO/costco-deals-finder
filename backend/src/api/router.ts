@@ -59,6 +59,33 @@ app.get('/api/deals/today', async (c: Context) => {
   }
 });
 
+// Search for deals by keyword
+app.get('/api/deals/search', async (c: Context) => {
+  const query = c.req.query('q');
+  if (!query) {
+    throw new HTTPException(400, { message: 'Search query parameter "q" is required' });
+  }
+
+  const db = new Database(c.env.costco_DB);
+
+  try {
+    const offers = await db.searchOffers(query);
+    return c.json({
+      data: offers,
+      meta: {
+        count: offers.length,
+        query,
+        timestamp: new Date().toISOString(),
+      },
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new HTTPException(500, { message: `Failed to search for deals: ${error.message}` });
+    }
+    throw new HTTPException(500, { message: 'An unexpected error occurred' });
+  }
+});
+
 // Ingest deals
 app.post('/api/ingest', async (c: Context) => {
   const db = new Database(c.env.costco_DB);

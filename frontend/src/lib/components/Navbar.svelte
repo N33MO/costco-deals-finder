@@ -1,6 +1,8 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { derived } from 'svelte/store';
+  import ToggleSwitch from './ToggleSwitch.svelte';
+  import { loadPictures } from '$lib/stores/settings';
 
   // Get the current path for active link highlighting
   const currentPath = derived(page, $page => $page.url.pathname);
@@ -10,13 +12,18 @@
   <div class="navbar-brand">
     <a href="/" class="app-title">Costco Deals Finder</a>
   </div>
-  <ul class="navbar-links">
-    <li><a href="/" class:active={$currentPath === '/'}>Today's Deals</a></li>
-    <li>
-      <a href="/history" class:active={$currentPath.startsWith('/history')}>Historical Deals</a>
-    </li>
-    <li><a href="/search" class:active={$currentPath.startsWith('/search')}>Search</a></li>
-  </ul>
+  <div class="flex-1">
+    <a href="/" class="btn btn-ghost normal-case text-xl">Costco Deals</a>
+  </div>
+  <div class="flex-none">
+    <ul class="menu menu-horizontal px-1">
+      <li><a href="/">Today's Deals</a></li>
+      <li><a href="/search">Search</a></li>
+      <li>
+        <ToggleSwitch label="Load Images" bind:checked={$loadPictures} />
+      </li>
+    </ul>
+  </div>
 </nav>
 
 <style>

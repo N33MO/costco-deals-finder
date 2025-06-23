@@ -59,6 +59,11 @@ npm run test:e2e
 - [x] Navbar for navigation (Home, Historical Deals, Search)
 - [x] Fetches deals using user's local date (timezone-aware)
 - [ ] Historical deals by date
-- [ ] Search and filtering
-- [ ] User preferences
+- [x] Search and filtering
+- [x] User preferences
 - [ ] Accessibility support
+
+## Features Overview
+
+- **Search Page**: A dedicated `/search` route allows users to find products by keyword. It fetches all historical deals for matching items and displays them.
+- **Image Loading Toggle**: A global toggle in the navbar allows users to enable or disable the loading of product images. This preference is managed by a Svelte store (`src/lib/stores/settings.ts`) and is disabled by default to save bandwidth.

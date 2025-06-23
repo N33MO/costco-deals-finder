@@ -120,6 +120,15 @@ Get today's active deals.
 }
 ```
 
+### GET /api/deals/search
+Search for deals by a keyword. The search is performed on the product name.
+
+**Query Parameters:**
+- `q` (required): The search query string.
+
+**Response:**
+Returns an array of all historical deals for products matching the search query, sorted by the most recent start date. The response format is identical to `GET /api/deals/today`.
+
 ## Database Schema
 
 See `migrations/0001_schema.sql` for the complete schema.
@@ -131,7 +140,7 @@ See `migrations/0001_schema.sql` for the complete schema.
 - [x] Unit testing setup
 - [ ] Integration testing
 - [x] Deal ingestion pipeline (data is ingested via the Python-based crawler and loaded into the D1 database for API access)
-- [ ] Search functionality
+- [x] Search functionality
 - [ ] Historical data support
 - [ ] Rate limiting
 - [ ] Authentication
