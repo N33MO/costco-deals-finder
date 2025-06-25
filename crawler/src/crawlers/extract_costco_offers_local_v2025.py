@@ -17,8 +17,8 @@ from bs4 import BeautifulSoup
 from pathlib import Path
 import re, json, sys, datetime as dt
 
-if len(sys.argv) != 2:
-    sys.exit("usage: extract_tiles_costco.py  <saved_html>")
+if len(sys.argv) not in (2, 4):
+    sys.exit("usage: extract_tiles_costco.py  <saved_html> [<start_YYYY-MM-DD> <end_YYYY-MM-DD>]")
 
 html_file = Path(sys.argv[1]).expanduser()
 soup      = BeautifulSoup(html_file.read_text("utf-8"), "lxml")
@@ -162,7 +162,7 @@ def extract_offer_channel(tile: "Tag") -> str:
 
 def extract_image_url(tile: "Tag") -> str | None:
     """Extract the product image URL from the tile."""
-    img_tag = tile.find("img", {"data-testid": "ImageVideo_Image"})
+    img_tag = tile.find("img")
     if not img_tag:
         return None
 
@@ -171,7 +171,7 @@ def extract_image_url(tile: "Tag") -> str | None:
         src_url = img_tag["src"]
         # Append width=320 to get a smaller image, if not already present.
         if 'width=' not in src_url:
-            return f"{src_url}&width=320"
+            return f"{src_url}"
         return src_url
 
     # Fallback to srcset for live pages.
@@ -188,8 +188,11 @@ def extract_image_url(tile: "Tag") -> str | None:
 # ────────────────────────────────────────────────────────────────────────────
 deals = []
 
-# Extract valid period once for all deals
-valid_period = extract_valid_period(soup)
+# Extract valid period from command line or HTML
+if len(sys.argv) == 4:
+    valid_period = {"starts": sys.argv[2], "ends": sys.argv[3]}
+else:
+    valid_period = extract_valid_period(soup)
 
 tiles = soup.find_all("div", {"data-testid": "AdBuilder"})
 for tile in tiles:
@@ -268,3 +271,7 @@ with open(output_file, "w") as f:
         f.write(json.dumps(d) + "\n")
 
 print(f"Wrote {len(deals)} deals to {output_file}")
+
+# Print number of deals with null SKU
+null_sku_count = sum(1 for d in deals if not d.get("sku"))
+print(f"Number of deals with null SKU: {null_sku_count}")

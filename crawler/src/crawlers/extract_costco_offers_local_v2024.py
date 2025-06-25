@@ -17,11 +17,13 @@ from bs4 import BeautifulSoup, Tag
 from pathlib import Path
 import re, json, sys, datetime as dt
 
-if len(sys.argv) != 2:
-    sys.exit("usage: extract_costco_offers_local_v2024.py <saved_html>")
+if len(sys.argv) not in (2, 4):
+    sys.exit("usage: extract_costco_offers_local_v2024.py <saved_html> [<start_YYYY-MM-DD> <end_YYYY-MM-DD>]")
 
 html_file = Path(sys.argv[1]).expanduser()
-soup = BeautifulSoup(html_file.read_text("utf-8"), "lxml")
+# Read as UTF-8, replacing invalid bytes with the replacement character
+html_text = html_file.read_text("utf-8", errors="replace")
+soup = BeautifulSoup(html_text, "lxml")
 
 # ────────────────────────────────────────────────────────────────────────────
 # Helpers
@@ -59,55 +61,131 @@ def determine_category(name: str, details: str) -> str:
             return category
     return "Other"
 
-def extract_valid_period(soup: BeautifulSoup) -> dict:
-    """Extract valid period from the HTML file."""
-    valid_p = soup.find("p", class_="eco-webvalid-header")
-    if not valid_p:
-        return {"starts": None, "ends": None}
-    
-    valid_text = valid_p.get_text(strip=True)
-    
-    # Format: "Valid August 28 to September 22, 2024"
-    #      or "Valid August 28 to 31, 2024"
-    pattern = r"Valid\s+([A-Za-z]+)\s+(\d{1,2})\s+to\s+(?:([A-Za-z]+)\s+)?(\d{1,2}),\s+(\d{4})"
-    match = re.search(pattern, valid_text)
-
-    if not match:
-        return {"starts": None, "ends": None}
-    
-    start_month_str, start_day_str, end_month_str, end_day_str, year_str = match.groups()
-
-    if not end_month_str:
-        end_month_str = start_month_str # Same month
-
+def parse_time_tag(time_tag):
+    """Return YYYY-MM-DD from <time> tag, using datetime if it matches text, else parse text."""
+    dt_str = time_tag["datetime"].strip()
+    text = time_tag.get_text(strip=True)
+    # Try to parse both as dates and compare
+    # Try several text formats
+    formats = ["%B %d, %Y", "%B %d", "%d, %Y", "%B %d %Y", "%d %B %Y"]
+    # First, parse datetime attr
     try:
-        start_date_str = f"{start_month_str} {start_day_str} {year_str}"
-        end_date_str = f"{end_month_str} {end_day_str} {year_str}"
-        
-        start_date = dt.datetime.strptime(start_date_str, "%B %d %Y").strftime("%Y-%m-%d")
-        end_date = dt.datetime.strptime(end_date_str, "%B %d %Y").strftime("%Y-%m-%d")
-        
-        return {"starts": start_date, "ends": end_date}
-    except ValueError:
-        return {"starts": None, "ends": None}
+        dt_date = dt.datetime.strptime(dt_str, "%Y-%m-%d").date()
+    except Exception as e:
+        print(f"[ERROR] Failed to parse <time> datetime attribute: {e}")
+        sys.exit(1)
+    # Try to parse text as date
+    text_date = None
+    for f in formats:
+        try:
+            # If text does not have year, try to get year from dt_str
+            if "%Y" not in f:
+                text_with_year = f"{text} {dt_date.year}"
+                text_date = dt.datetime.strptime(text_with_year, f+" %Y").date()
+            else:
+                text_date = dt.datetime.strptime(text, f).date()
+            break
+        except Exception:
+            continue
+    if text_date is None:
+        print(f"[ERROR] Could not parse <time> tag text: '{text}'")
+        sys.exit(1)
+    if text_date == dt_date:
+        return dt_date.strftime("%Y-%m-%d")
+    else:
+        return text_date.strftime("%Y-%m-%d")
+
+def extract_valid_period(soup: BeautifulSoup) -> dict:
+    """Extract valid period from the HTML file, supporting all known formats with <time> tags and text. Use <time datetime=""> only if it matches the text, else parse the text. Exit on error."""
+    # Try to find <p class="eco-webValid"> with two <time> tags
+    valid_p = soup.find("p", class_="eco-webValid")
+    if valid_p and valid_p.find("time"):
+        times = valid_p.find_all("time")
+        if len(times) == 2:
+            start_date = parse_time_tag(times[0])
+            end_date = parse_time_tag(times[1])
+            return {"starts": start_date, "ends": end_date}
+        else:
+            print("[ERROR] Could not find two <time> tags in valid period section.")
+            sys.exit(1)
+    # Fallback: old format (eco-webvalid-header)
+    valid_p = soup.find("p", class_="eco-webvalid-header")
+    if valid_p:
+        valid_text = valid_p.get_text(strip=True)
+        pattern = r"Valid\s+([A-Za-z]+)\s+(\d{1,2})\s+to\s+(?:([A-Za-z]+)\s+)?(\d{1,2}),\s+(\d{4})"
+        match = re.search(pattern, valid_text)
+        if not match:
+            print("[ERROR] Could not parse valid period from eco-webvalid-header.")
+            sys.exit(1)
+        start_month_str, start_day_str, end_month_str, end_day_str, year_str = match.groups()
+        if not end_month_str:
+            end_month_str = start_month_str # Same month
+        try:
+            start_date_str = f"{start_month_str} {start_day_str} {year_str}"
+            end_date_str = f"{end_month_str} {end_day_str} {year_str}"
+            start_date = dt.datetime.strptime(start_date_str, "%B %d %Y").strftime("%Y-%m-%d")
+            end_date = dt.datetime.strptime(end_date_str, "%B %d %Y").strftime("%Y-%m-%d")
+            return {"starts": start_date, "ends": end_date}
+        except ValueError as e:
+            print(f"[ERROR] Failed to parse valid period dates: {e}")
+            sys.exit(1)
+    # Fallback: new format 'Valid April 12 - May 7, 2023' or 'Valid April 12 - 15, 2023'
+    for p in soup.find_all("p"):
+        text = p.get_text(strip=True)
+        # Try full month for both start and end
+        pattern1 = r"Valid\s+([A-Za-z]+)\s+(\d{1,2})\s*-\s*([A-Za-z]+)\s+(\d{1,2}),\s*(\d{4})"
+        match1 = re.search(pattern1, text)
+        if match1:
+            start_month_str, start_day_str, end_month_str, end_day_str, year_str = match1.groups()
+            try:
+                start_date_str = f"{start_month_str} {start_day_str} {year_str}"
+                end_date_str = f"{end_month_str} {end_day_str} {year_str}"
+                start_date = dt.datetime.strptime(start_date_str, "%B %d %Y").strftime("%Y-%m-%d")
+                end_date = dt.datetime.strptime(end_date_str, "%B %d %Y").strftime("%Y-%m-%d")
+                return {"starts": start_date, "ends": end_date}
+            except ValueError as e:
+                print(f"[ERROR] Failed to parse valid period dates: {e}")
+                sys.exit(1)
+        # Try same month for start and end
+        pattern2 = r"Valid\s+([A-Za-z]+)\s+(\d{1,2})\s*-\s*(\d{1,2}),\s*(\d{4})"
+        match2 = re.search(pattern2, text)
+        if match2:
+            month_str, start_day_str, end_day_str, year_str = match2.groups()
+            try:
+                start_date_str = f"{month_str} {start_day_str} {year_str}"
+                end_date_str = f"{month_str} {end_day_str} {year_str}"
+                start_date = dt.datetime.strptime(start_date_str, "%B %d %Y").strftime("%Y-%m-%d")
+                end_date = dt.datetime.strptime(end_date_str, "%B %d %Y").strftime("%Y-%m-%d")
+                return {"starts": start_date, "ends": end_date}
+            except ValueError as e:
+                print(f"[ERROR] Failed to parse valid period dates: {e}")
+                sys.exit(1)
+    print("[ERROR] Could not find a valid period in the HTML file.")
+    sys.exit(1)
 
 def parse_discount_v2024(tile: Tag) -> tuple[float, str] | None:
     """
     Examine the price table inside a tile and return (value, kind).
+    Handles nested tags and multiple text nodes in the discount value.
     """
     price_table = tile.find("table", class_="eco-price")
     if not price_table:
         return None
 
     symbol_span = price_table.find("span", class_="eco-dollarSign")
-    dollar_span = price_table.find("span", class_="eco-dollar")
-    
-    if not dollar_span:
+    # Robustly extract the full text from all eco-dollar spans (handles nested tags)
+    dollar_spans = price_table.find_all("span", class_="eco-dollar")
+    dollar_text = "".join([s.get_text(strip=True) for s in dollar_spans])
+    # Fallback: try to get all text from price_table if above fails
+    if not dollar_text:
+        dollar_text = price_table.get_text(strip=True)
+    # Extract the first number (integer or float) from the text
+    m = re.search(r"(\d+(?:\.\d+)?)", dollar_text)
+    if not m:
         return None
-        
     try:
-        value = float(dollar_span.text.strip())
-        kind = "percent" if symbol_span and "%" in symbol_span.text else "dollar"
+        value = float(m.group(1))
+        kind = "percent" if symbol_span and "%" in symbol_span.get_text() else "dollar"
         return value, kind
     except (ValueError, TypeError):
         return None
@@ -132,14 +210,17 @@ def extract_offer_channel_v2024(tile: Tag) -> str:
 
 def extract_image_url_v2024(tile: Tag) -> str | None:
     """Extract the product image URL from the tile."""
-    img_tag = tile.find("img", class_="eco-webImage")
+    img_tag = tile.find("img")
     return clean_archive_url(img_tag["src"]) if img_tag and img_tag.has_attr("src") else None
 
 # ────────────────────────────────────────────────────────────────────────────
 deals = []
 
-# Extract valid period once for all deals
-valid_period = extract_valid_period(soup)
+# Extract valid period from command line or HTML
+if len(sys.argv) == 4:
+    valid_period = {"starts": sys.argv[2], "ends": sys.argv[3]}
+else:
+    valid_period = extract_valid_period(soup)
 
 tiles = soup.find_all("li", class_="eco-coupons")
 for tile in tiles:
@@ -209,3 +290,7 @@ with open(output_file, "w") as f:
         f.write(json.dumps(d) + "\n")
 
 print(f"Wrote {len(deals)} deals to {output_file}") 
+
+# Print number of deals with null SKU
+null_sku_count = sum(1 for d in deals if not d.get("sku"))
+print(f"Number of deals with null SKU: {null_sku_count}") 

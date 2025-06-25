@@ -13,17 +13,20 @@ Python-based data collection system for the Costco Deals Finder.
 ### Setup
 
 1. Create and activate virtual environment:
+
    ```bash
    python -m venv venv
    source venv/bin/activate  # On Windows: .\venv\Scripts\activate
    ```
 
 2. Install dependencies:
+
    ```bash
    pip install -r requirements.txt
    ```
 
 3. Create `.env` file:
+
    ```bash
    cp .env.example .env
    ```
@@ -76,7 +79,8 @@ python src/processors/transform_local_deals.py
 
 ## Output Format
 
-The crawler outputs data in NDJSON format with the following structure:
+- The crawler outputs data in NDJSON format with accurate local date formatting for start and end dates (YYYY-MM-DD), ensuring correct timeline visualization in the frontend.
+- This data is used to power the DealHistoryCard timeline and interactive tooltips in the web UI.
 
 ```json
 {
@@ -87,4 +91,4 @@ The crawler outputs data in NDJSON format with the following structure:
   "starts": "YYYY-MM-DD",
   "ends": "YYYY-MM-DD"
 }
-``` 
+```

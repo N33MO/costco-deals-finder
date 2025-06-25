@@ -85,6 +85,9 @@ npm run test:ci
 
 ## API Endpoints
 
+- All endpoints return deal periods with accurate local date formatting, supporting the frontend's timeline visualization and tooltips.
+- The search endpoint returns all historical deals for a product, including overlapping and cross-year periods, for use in the DealHistoryCard timeline UI.
+
 ### GET /api/deals/today
 Get today's active deals.
 
@@ -128,6 +131,7 @@ Search for deals by a keyword. The search is performed on the product name.
 
 **Response:**
 Returns an array of all historical deals for products matching the search query, sorted by the most recent start date. The response format is identical to `GET /api/deals/today`.
+- Each deal includes start and end dates in `YYYY-MM-DD` format (local time), discount, channel, and other details for timeline and tooltip display.
 
 ## Database Schema
 

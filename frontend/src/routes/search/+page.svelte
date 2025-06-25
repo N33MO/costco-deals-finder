@@ -1,6 +1,6 @@
 <script lang="ts">
   import SearchInput from '$lib/components/SearchInput.svelte';
-  import DealCard from '$lib/components/DealCard.svelte';
+  import DealHistoryCard from '$lib/components/DealHistoryCard.svelte';
 
   type Deal = {
     // Offer fields
@@ -31,7 +31,56 @@
   let error: string | null = null;
   let query = '';
 
-  async function handleSearch(event: any) {
+  // Group deals by SKU
+  $: groupedDeals = deals.reduce(
+    (acc, deal) => {
+      if (!acc[deal.sku]) {
+        acc[deal.sku] = {
+          name: deal.name,
+          sku: deal.sku,
+          image_url: deal.image_url,
+          deals: [],
+        };
+      }
+      acc[deal.sku].deals.push({
+        starts: deal.starts,
+        ends: deal.ends,
+        discount:
+          deal.sale_type === 'dollar'
+            ? `${deal.currency} ${deal.discount_low}` +
+              (deal.discount_high !== deal.discount_low
+                ? `–${deal.currency} ${deal.discount_high}`
+                : '')
+            : `${deal.discount_low}` +
+              (deal.discount_high !== deal.discount_low ? `–${deal.discount_high}` : '') +
+              '%',
+        sale_type: deal.sale_type,
+        channel: deal.channel,
+        limit_qty: deal.limit_qty,
+        details: deal.details,
+      });
+      return acc;
+    },
+    {} as Record<
+      string,
+      {
+        name: string;
+        sku: string;
+        image_url: string | null;
+        deals: Array<{
+          starts: string;
+          ends: string;
+          discount: string;
+          sale_type: 'dollar' | 'percent';
+          channel: string | null;
+          limit_qty: number | null;
+          details: string | null;
+        }>;
+      }
+    >
+  );
+
+  async function handleSearch(event: CustomEvent<string>) {
     query = event.detail;
     if (!query) {
       deals = [];
@@ -64,9 +113,14 @@
     {:else if deals.length === 0 && query}
       <p>No deals found for "{query}".</p>
     {:else if deals.length > 0}
-      <div class="deals-grid">
-        {#each deals as deal}
-          <DealCard {...deal} />
+      <div class="history-list">
+        {#each Object.values(groupedDeals) as product}
+          <DealHistoryCard
+            name={product.name}
+            sku={product.sku}
+            image_url={product.image_url}
+            deals={product.deals}
+          />
         {/each}
       </div>
     {/if}
@@ -80,18 +134,16 @@
     padding: 2rem;
     text-align: center;
   }
-  .deals-grid {
+  .history-list {
     display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-    justify-content: center;
+    flex-direction: column;
+    gap: 2.5rem;
+    align-items: center;
     margin-top: 2rem;
   }
   @media (max-width: 700px) {
-    .deals-grid {
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
+    .history-list {
+      gap: 1.2rem;
     }
   }
 </style>

@@ -11,8 +11,11 @@ A web application that helps users track and analyze Costco deals and savings.
 ## Key Features
 
 - **Deal Search**: Search through all historical deals by keyword.
+- **Advanced Timeline Visualization**: View a product's entire deal history in a year-by-year, month-by-month timeline. Partial month coverage is shown with triangle highlights, and full months are fully highlighted.
+- **Interactive Tooltips**: Hover over any highlighted month to see detailed deal info, including discount, valid period, limit, and channel, with visually distinct highlights.
 - **Image Toggling**: Enable or disable product image loading to save bandwidth.
 - **Daily Deals**: View all active deals for the current day.
+- **Accurate Local Date Handling**: All deal periods are displayed using local time, ensuring correct month alignment regardless of timezone.
 
 ## Technical Stack
 
@@ -61,6 +64,8 @@ A web application that helps users track and analyze Costco deals and savings.
    cd frontend
    npm install
    ```
+
+   - Features a responsive, interactive timeline for historical deals (see below).
 
    **Backend:**
 
@@ -136,6 +141,14 @@ A web application that helps users track and analyze Costco deals and savings.
   - [ ] Create /history page with date picker
   - [ ] Fetch and display deals for a selected date
 - [ ] Continue backend and integration improvements
+
+## Frontend Timeline UI (New)
+
+- The search page now groups deals by product and displays a timeline for each product.
+- Each timeline row represents a year, with 12 boxes for each month.
+- If a deal covers a month, the box is highlighted (fully or as a triangle for partial coverage).
+- Hovering a highlighted month shows a tooltip with all deal details (discount, period, limit, channel, etc.).
+- All date calculations use local time for accuracy.
 
 ## Contributing
 

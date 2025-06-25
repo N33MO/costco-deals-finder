@@ -151,11 +151,14 @@ def main():
     parser.add_argument('--file', required=True, help='Path to the NDJSON file containing deals')
     parser.add_argument('--sql-out', help='Output SQL file (all tables)', default=None)
     parser.add_argument('--unavailable-file', help='Path to save unavailable deals (default: unprocessed_YYYYMMDD-YYYYMMDD.ndjson)')
+    parser.add_argument('--ignore-unavailable', action='store_true', help='If set, do not write unavailable deals NDJSON')
     args = parser.parse_args()
 
-    # Determine processed output directory relative to this script
+    # Determine processed and sqls output directories relative to this script
     script_dir = Path(__file__).parent
     processed_dir = (script_dir / '..' / '..' / 'data' / 'processed').resolve()
+    sqls_dir = (script_dir / '..' / '..' / 'data' / 'sqls').resolve()
+    sqls_dir.mkdir(parents=True, exist_ok=True)
     processed_dir.mkdir(parents=True, exist_ok=True)
 
     # Derive base name from input file
@@ -163,7 +166,7 @@ def main():
     base = input_path.stem
 
     # Set SQL output path if not provided
-    args.sql_out = args.sql_out or str(processed_dir / f"{base}.sql")
+    args.sql_out = args.sql_out or str(sqls_dir / f"{base}.sql")
 
     # Set unavailable deals output path if not provided
     if not args.unavailable_file:
@@ -191,10 +194,12 @@ def main():
     offer_periods = [transform_offer_period(d) for d in available]
     offer_snapshots = [transform_offer_snapshot(d) for d in available]
 
-    # Write unavailable deals NDJSON if any
-    if unavailable:
+    # Write unavailable deals NDJSON if any and not ignored
+    if unavailable and not args.ignore_unavailable:
         write_ndjson(unavailable, args.unavailable_file)
         print(f"Saved {len(unavailable)} unavailable deals to {args.unavailable_file}")
+    elif unavailable and args.ignore_unavailable:
+        print(f"Skipped writing {len(unavailable)} unavailable deals due to --ignore-unavailable flag.")
     
     # Report statistics
     print(f"\nDeal Statistics:")
