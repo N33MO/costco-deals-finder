@@ -11,8 +11,7 @@
     "build": "npm run build --workspaces",
     "test": "npm run test --workspaces",
     "lint": "prettier --check . && eslint .",
-    "format": "prettier --write .",
-    "prepare": "husky"
+    "format": "prettier --write ."
   },
   "devDependencies": {
     "husky": "^9.1.7",
