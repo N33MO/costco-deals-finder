@@ -10,9 +10,11 @@
       href="https://github.com/N33MO/costco-deals-finder"
       class="github-link"
       target="_blank"
-      rel="noopener">GitHub – bugs</a
+      rel="noopener">GitHub - bugs</a
     ><br />
-    Unofficial project — not affiliated with or endorsed by Costco Wholesale Corp.
+    <p class="disclaimer">
+      Unofficial project — not affiliated with or endorsed by Costco Wholesale Corp.
+    </p>
   </small>
 </footer>
 
