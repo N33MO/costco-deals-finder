@@ -1,5 +1,7 @@
 # Costco Deals Finder
 
+[🌐 Try the live demo!](https://costco-deals-finder.pages.dev/) — _Disclaimer: This project is unofficial, not affiliated with Costco, and provided for educational purposes only. Please use responsibly and do not misuse the data._
+
 A web application that helps users track and analyze Costco deals and savings.
 
 ## Project Structure
