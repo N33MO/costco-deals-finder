@@ -60,7 +60,15 @@
 </script>
 
 <main>
-  <h1 style="font-size:2rem;font-weight:bold;margin-bottom:1.5rem;">Today's Deals</h1>
+  <h1 style="font-size:2rem;font-weight:bold;margin-bottom:0.75rem;">Today's Deals</h1>
+  <p style="margin-bottom:1.5rem;">
+    <a
+      href="https://www.costco.com/online-offers.html"
+      target="_blank"
+      rel="noopener noreferrer"
+      style="color:#0070f3;text-decoration:underline;">See current online offers on Costco.com</a
+    >
+  </p>
   {#if loading}
     <p>Loading deals...</p>
   {:else if error}
