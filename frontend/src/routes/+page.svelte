@@ -1,6 +1,8 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import DealCard from '../lib/components/DealCard.svelte';
+  import ErrorBanner from '../lib/components/ErrorBanner.svelte';
+  import { apiFetch } from '$lib/api';
 
   type Deal = {
     // Offer fields
@@ -40,8 +42,13 @@
         String(now.getMonth() + 1).padStart(2, '0') +
         '-' +
         String(now.getDate()).padStart(2, '0');
-      const res = await fetch(`/api/deals/today?date=${localDate}`);
-      if (!res.ok) throw new Error('Failed to fetch deals');
+      const res = await apiFetch(`/api/deals/today?date=${localDate}`);
+      if (!res.ok) {
+        if (res.status === 429) {
+          throw new Error('Too many requests. Please wait a minute and refresh.');
+        }
+        throw new Error('We are having trouble loading deals right now. Please try again shortly.');
+      }
       const json = await res.json();
       deals = json.data;
     } catch (e) {
@@ -57,7 +64,7 @@
   {#if loading}
     <p>Loading deals...</p>
   {:else if error}
-    <p style="color: red">{error}</p>
+    <ErrorBanner message={error} />
   {:else if deals.length === 0}
     <p>No deals found for today.</p>
   {:else}

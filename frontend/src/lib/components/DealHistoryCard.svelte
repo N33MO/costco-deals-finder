@@ -284,7 +284,10 @@
       <span class="year-label timeline-label-placeholder"></span>
       <div class="month-boxes">
         {#each months as month}
-          <div class="month-box month-header">{month}</div>
+          <div class="month-box month-header">
+            <span class="month-label long">{month}</span>
+            <span class="month-label short">{month[0]}</span>
+          </div>
         {/each}
       </div>
     </div>
@@ -430,7 +433,7 @@
     color: #1760c4;
     font-weight: 700;
     border-bottom: 2px solid #005fcc;
-    height: 2.1rem;
+    height: 2.2rem;
   }
   .month-active {
     background: #1a7f37;
@@ -488,8 +491,11 @@
   @media (max-width: 600px) {
     .month-box {
       font-size: 0.95rem;
-      height: 1.2rem;
+      height: 2.2rem;
       padding: 0 0.1rem;
+    }
+    .month-header {
+      height: 2.2rem;
     }
     .year-label {
       width: 2.2rem;
@@ -530,5 +536,21 @@
     font-weight: 600;
     display: inline-block;
     margin-top: 0.2rem;
+  }
+  /* Month label visibility */
+  .month-label.long {
+    display: inline;
+  }
+  .month-label.short {
+    display: none;
+  }
+  /* Switch to short label on small screens */
+  @media screen and (max-width: 600px) {
+    .month-label.long {
+      display: none !important;
+    }
+    .month-label.short {
+      display: inline !important;
+    }
   }
 </style>

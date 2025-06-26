@@ -1,6 +1,8 @@
 <script lang="ts">
   import SearchInput from '$lib/components/SearchInput.svelte';
   import DealHistoryCard from '$lib/components/DealHistoryCard.svelte';
+  import ErrorBanner from '$lib/components/ErrorBanner.svelte';
+  import { apiFetch } from '$lib/api';
 
   type Deal = {
     // Offer fields
@@ -89,8 +91,13 @@
     loading = true;
     error = null;
     try {
-      const res = await fetch(`/api/deals/search?q=${encodeURIComponent(query)}`);
-      if (!res.ok) throw new Error('Failed to fetch search results');
+      const res = await apiFetch(`/api/deals/search?q=${encodeURIComponent(query)}`);
+      if (!res.ok) {
+        if (res.status === 429) {
+          throw new Error('You are searching too quickly. Please wait a minute and try again.');
+        }
+        throw new Error('We are having trouble fetching search results. Please try again later.');
+      }
       const json = await res.json();
       deals = json.data;
     } catch (e) {
@@ -109,7 +116,7 @@
     {#if loading}
       <p>Loading results...</p>
     {:else if error}
-      <p style="color: red">{error}</p>
+      <ErrorBanner message={error} />
     {:else if deals.length === 0 && query}
       <p>No deals found for "{query}".</p>
     {:else if deals.length > 0}

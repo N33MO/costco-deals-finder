@@ -4,6 +4,7 @@ import { cors } from 'hono/cors';
 import { prettyJSON } from 'hono/pretty-json';
 import type { Context } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+import { rateLimit } from '../middleware/rateLimit';
 
 export type Env = {
   DB: D1Database;
@@ -14,6 +15,7 @@ const app = new Hono<{ Bindings: Env }>();
 // Middleware
 app.use('*', cors());
 app.use('*', prettyJSON());
+app.use('/api/*', rateLimit({ windowMs: 60_000, max: 30 }));
 
 // Error handling middleware
 app.onError((err: Error, c: Context) => {
@@ -37,7 +39,7 @@ app.get('/', (c: Context) => c.text('Costco Deals Finder API'));
 app.get('/api/deals/today', async (c: Context) => {
   const region = c.req.query('region') || 'US';
   const date = c.req.query('date');
-  const db = new Database(c.env.costco_DB);
+  const db = new Database(c.env.DB);
   // log the current date in the format YYYY-MM-DD
   console.log(date);
 
@@ -66,7 +68,7 @@ app.get('/api/deals/search', async (c: Context) => {
     throw new HTTPException(400, { message: 'Search query parameter "q" is required' });
   }
 
-  const db = new Database(c.env.costco_DB);
+  const db = new Database(c.env.DB);
 
   try {
     const offers = await db.searchOffers(query);
@@ -87,8 +89,9 @@ app.get('/api/deals/search', async (c: Context) => {
 });
 
 // Ingest deals
+/*
 app.post('/api/ingest', async (c: Context) => {
-  const db = new Database(c.env.costco_DB);
+  const db = new Database(c.env.DB);
   const body = await c.req.json();
 
   // Validate request body
@@ -110,5 +113,6 @@ app.post('/api/ingest', async (c: Context) => {
     throw new HTTPException(500, { message: 'An unexpected error occurred' });
   }
 });
+*/
 
 export default app;

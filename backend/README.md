@@ -43,7 +43,7 @@ Cloudflare Worker with D1 database for the Costco Deals Finder.
 
 ### Environment Variables & Secrets
 
-- Non-secret variables (e.g., ENVIRONMENT) are set in `wrangler.toml` or `wrangler.dev.toml`.
+- Non-secret variables (e.g., `ENVIRONMENT`) and the **D1 binding named `DB`** are declared in `wrangler.toml` / `wrangler.dev.toml`.
 - **Secrets** (API keys, etc.) should be set using Wrangler:
   ```bash
   wrangler secret put SECRET_NAME
@@ -146,6 +146,14 @@ See `migrations/0001_schema.sql` for the complete schema.
 - [x] Deal ingestion pipeline (data is ingested via the Python-based crawler and loaded into the D1 database for API access)
 - [x] Search functionality
 - [ ] Historical data support
-- [ ] Rate limiting
+- [x] Rate limiting (30 req/min per IP via in-Worker middleware)
 - [ ] Authentication
 - [x] /api/deals/today supports a 'date' parameter for local time (frontend sends user's local date)
+
+### Rate Limiting
+
+The API is protected by an in-Worker middleware that limits each IP to **30 requests per minute per endpoint**.
+
+If the limit is exceeded, the Worker returns a **429 Too Many Requests** response with a styled HTML error page and a `Retry-After` header.
+
+To tweak the limits, edit `src/middleware/rateLimit.ts` and the middleware registration line in `src/api/router.ts`.
