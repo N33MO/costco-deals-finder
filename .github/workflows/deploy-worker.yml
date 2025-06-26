@@ -22,11 +22,11 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        working-directory: backend
+        working-directory: costco-deals-finder/backend
         run: npm ci
 
       - name: Deploy to Cloudflare Workers
-        working-directory: backend
+        working-directory: costco-deals-finder/backend
         run: npx wrangler deploy --minify
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }} 
