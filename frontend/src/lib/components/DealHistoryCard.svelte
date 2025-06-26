@@ -12,6 +12,7 @@
 -->
 <script lang="ts">
   import { loadPictures } from '$lib/stores/settings';
+  import { onMount } from 'svelte';
 
   export let name: string;
   export let image_url: string | null = null;
@@ -167,6 +168,24 @@
     deal: null as null | (typeof deals)[0],
     monthIdx: 0,
   };
+
+  // Detect mobile / narrow viewport
+  let isMobile = false;
+
+  function updateViewport() {
+    isMobile = window.innerWidth <= 600;
+  }
+
+  onMount(() => {
+    updateViewport();
+    window.addEventListener('resize', updateViewport);
+    return () => window.removeEventListener('resize', updateViewport);
+  });
+
+  // Reactive tooltip style string
+  $: tooltipStyle = isMobile
+    ? `top: ${tooltip.y + 12}px; left: 50%; transform: translateX(-50%);`
+    : `top: ${tooltip.y + 12}px; left: ${tooltip.x + 12}px;`;
 
   function showTooltip(
     event: MouseEvent,
@@ -331,7 +350,7 @@
 </div>
 
 {#if tooltip.show && tooltip.deal}
-  <div class="deal-tooltip" style="top: {tooltip.y + 12}px; left: {tooltip.x + 12}px;">
+  <div class="deal-tooltip {isMobile ? 'mobile' : ''}" style={tooltipStyle}>
     <div class="tooltip-discount">
       <strong>{tooltip.deal.discount}</strong>
       {tooltip.deal.sale_type === 'percent' ? '%' : ''} OFF
@@ -552,5 +571,9 @@
     .month-label.short {
       display: inline !important;
     }
+  }
+  /* Mobile-specific overrides when tooltip centered */
+  .deal-tooltip.mobile {
+    max-width: 90vw;
   }
 </style>
